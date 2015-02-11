@@ -7,8 +7,7 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-with open(path.join(here, 'VERSION')) as f:
-    version = f.read().strip()
+version = '0.1.0b1'
 
 setup(
     name='flask-ripozo',
