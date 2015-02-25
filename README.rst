@@ -4,6 +4,10 @@ flask-ripozo
 .. image:: https://travis-ci.org/vertical-knowledge/flask-ripozo.svg?branch=master
     :target: https://travis-ci.org/vertical-knowledge/flask-ripozo
 
+.. image:: https://readthedocs.org/projects/flask-ripozo/badge/?version=latest
+    :target: https://flask-ripozo.readthedocs.org/
+    :alt: Documentation Status
+
 This package provides a dispatcher for ripozo so that you can
 integrate ripozo with Flask.  As with all dispatchers it is simply
 for getting the request arguments and appropriately routing them to

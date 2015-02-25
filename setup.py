@@ -18,5 +18,8 @@ setup(
     description='',
     install_requires=['ripozo', 'Flask'],
     test_suite='tests',
-    tests_require=['ripozo-tests']
+    tests_require=[
+        'ripozo-tests',
+        'tox'
+    ]
 )
