@@ -11,9 +11,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-
+   ./API/flask_ripozo.rst
 
 .. include:: ../../README.rst
+
+.. include:: ../../CHANGELOG.rst
 
 
 

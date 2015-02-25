@@ -4,7 +4,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from flask import Flask
 
-from flask_ripozo.dispatcher import FlaskDispatcher
+from flask_ripozo import FlaskDispatcher
 from ripozo_tests.helpers.hello_world_viewset import HelloWorldViewset
 
 

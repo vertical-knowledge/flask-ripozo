@@ -15,8 +15,9 @@ This example describes a minimal flask-ripozo application.
 
     from flask import Flask
 
+    from flask_ripozo import FlaskDispatcher
+
     from ripozo.decorators import apimethod
-    from ripozo.viewsets.relationships.relationship import Relationship
     from ripozo.viewsets.resource_base import ResourceBase
 
     from ripozo_tests.helpers.inmemory_manager import InMemoryManager
@@ -65,9 +66,3 @@ This example describes a minimal flask-ripozo application.
 
     if __name__ == '__main__':
         app.run() # Run the app
-
-
-Change log
-==========
-
-.. include:: ./CHANGELOG.rst
