@@ -16,5 +16,7 @@ setup(
     author='Tim Martin',
     author_email='tim.martin@vertical-knowledge.com',
     description='',
-    install_requires=['ripozo', 'Flask']
+    install_requires=['ripozo', 'Flask'],
+    test_suite='tests',
+    tests_require=['ripozo-tests']
 )
