@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from setuptools import setup, find_packages
 
 
-version = '0.1.0b3'
+version = '0.1.0b6'
 
 setup(
     name='flask-ripozo',

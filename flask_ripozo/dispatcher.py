@@ -4,7 +4,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from flask import request, jsonify
 from ripozo.dispatch.dispatch_base import DispatcherBase
-from ripozo.dispatch.adapters.siren import SirenAdapter
 from werkzeug.routing import Rule, Map
 import json
 
@@ -73,3 +72,7 @@ class FlaskDispatcher(DispatcherBase):
         adapter = self.dispatch(endpoint_func, format_type, urlparams, request_args, request.form)
         response = json.loads(adapter.formatted_body)
         return jsonify(response)
+
+    @property
+    def base_url(self):
+        return request.url_root
