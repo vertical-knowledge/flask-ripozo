@@ -4,6 +4,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from flask import request, jsonify
 from ripozo.dispatch.dispatch_base import DispatcherBase
+from ripozo.viewsets.request import RequestContainer
 from werkzeug.routing import Rule, Map
 import json
 
@@ -24,6 +25,10 @@ class FlaskDispatcher(DispatcherBase):
         self.app = app
         self.url_map = Map()
         self.function_for_endpoint = {}
+
+    @property
+    def base_url(self):
+        return request.url_root
 
     def register_route(self, endpoint, endpoint_func=None, route=None, methods=None, **options):
         """
@@ -69,10 +74,8 @@ class FlaskDispatcher(DispatcherBase):
         format_type = request_args.pop('format', 'siren')
         endpoint, args = urls.match()
         endpoint_func = self.function_for_endpoint[endpoint]
-        adapter = self.dispatch(endpoint_func, format_type, urlparams, request_args, request.form)
+        r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=request.form.copy(),
+                             headers=request.headers)
+        adapter = self.dispatch(endpoint_func, format_type, r)
         response = json.loads(adapter.formatted_body)
         return jsonify(response)
-
-    @property
-    def base_url(self):
-        return request.url_root

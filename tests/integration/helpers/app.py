@@ -5,12 +5,14 @@ from __future__ import unicode_literals
 from flask import Flask
 
 from flask_ripozo import FlaskDispatcher
+from ripozo.dispatch.adapters import SirenAdapter
 from ripozo_tests.helpers.hello_world_viewset import HelloWorldViewset
 
 
 app = Flask(__name__)
 
 dispatcher = FlaskDispatcher(app)
+dispatcher.register_adapters(SirenAdapter)
 dispatcher.register_class_routes(HelloWorldViewset)
 
 @app.route('/')
