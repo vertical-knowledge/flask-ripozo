@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from ripozo.dispatch.dispatch_base import DispatcherBase
 from ripozo.viewsets.request import RequestContainer
 from werkzeug.routing import Rule, Map
@@ -77,5 +77,5 @@ class FlaskDispatcher(DispatcherBase):
         r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=request.form.copy(),
                              headers=request.headers)
         adapter = self.dispatch(endpoint_func, format_type, r)
-        response = json.loads(adapter.formatted_body)
-        return jsonify(response)
+        response = Response(response=adapter.formatted_body, headers=adapter.extra_headers, content_type=adapter.extra_headers['Content-Type'])
+        return adapter.formatted_body
