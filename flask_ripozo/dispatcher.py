@@ -70,12 +70,11 @@ class FlaskDispatcher(DispatcherBase):
         :rtype: flask.Response
         """
         urls = self.url_map.bind_to_environ(request.environ)
-        request_args = request.args.copy()
-        format_type = request_args.pop('format', 'siren')
-        endpoint, args = urls.match()
+        request_args = dict(request.args)
+        endpoint, args = urls.match(method=request.method)
         endpoint_func = self.function_for_endpoint[endpoint]
-        r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=request.form.copy(),
+        r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=dict(request.form),
                              headers=request.headers)
-        adapter = self.dispatch(endpoint_func, format_type, r)
+        adapter = self.dispatch(endpoint_func, request.content_type, r)
         response = Response(response=adapter.formatted_body, headers=adapter.extra_headers, content_type=adapter.extra_headers['Content-Type'])
         return adapter.formatted_body
