@@ -58,3 +58,6 @@ target/
 # PyCharm IDE
 .idea/
 
+# Don't want to accidentally release passwords
+setup.cfg
+
