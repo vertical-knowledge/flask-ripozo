@@ -2,11 +2,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from flask import request, jsonify, Response
+
+from flask import request, Response
+
 from ripozo.dispatch.dispatch_base import DispatcherBase
+from ripozo.utilities import join_url_parts
 from ripozo.viewsets.request import RequestContainer
+
 from werkzeug.routing import Rule, Map
-import json
 
 
 class FlaskDispatcher(DispatcherBase):
@@ -15,16 +18,22 @@ class FlaskDispatcher(DispatcherBase):
     ripozo with flask.  Pretty simple right?
     """
 
-    def __init__(self, app):
+    def __init__(self, app, url_prefix=''):
         """
         Eventually these will be able to be registed to a blueprint.
         But for now it will probably break the routing by the adapters.
 
-        :param flask.Flask|flask.Blueprint app:
+        :param flask.Flask app: The flask app that is responsible for
+            handling the web application.
+        :param unicode url_prefix: The url prefix will be prepended to
+            every route that is registered on this dispatcher.  It is
+            helpful if, for example, you want to expose your api
+            on the '/api' path.
         """
         self.app = app
         self.url_map = Map()
         self.function_for_endpoint = {}
+        self.url_prefix = url_prefix
 
     @property
     def base_url(self):
@@ -46,6 +55,7 @@ class FlaskDispatcher(DispatcherBase):
         :param dict options: The additional options to pass to the add_url_rule
         """
         # TODO why the None?
+        route = join_url_parts(self.url_prefix, route)
         self.app.add_url_rule(route, None, self.flask_dispatch, methods=methods, **options)
         self.url_map.add(Rule(route, endpoint=endpoint, methods=methods))
         self.function_for_endpoint[endpoint] = endpoint_func
