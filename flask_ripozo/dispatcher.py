@@ -37,7 +37,9 @@ class FlaskDispatcher(DispatcherBase):
 
     @property
     def base_url(self):
-        return request.url_root
+        # TODO this is a temp fix
+        # It will break with multiple dispatchers working together.
+        return join_url_parts(request.url_root, self.url_prefix)
 
     def register_route(self, endpoint, endpoint_func=None, route=None, methods=None, **options):
         """
@@ -55,6 +57,8 @@ class FlaskDispatcher(DispatcherBase):
         :param dict options: The additional options to pass to the add_url_rule
         """
         # TODO why the None?
+        # TODO this is a temp fix
+        # It will break with multiple dispatchers working together.
         route = join_url_parts(self.url_prefix, route)
         self.app.add_url_rule(route, None, self.flask_dispatch, methods=methods, **options)
         self.url_map.add(Rule(route, endpoint=endpoint, methods=methods))
