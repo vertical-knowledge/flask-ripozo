@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from flask import request, Response
 
 from ripozo.dispatch.dispatch_base import DispatcherBase
+from ripozo.exceptions import RestException
 from ripozo.utilities import join_url_parts
 from ripozo.viewsets.request import RequestContainer
 
@@ -92,11 +93,11 @@ class FlaskDispatcher(DispatcherBase):
         format_type = request.content_type
         try:
             adapter = self.dispatch(endpoint_func, format_type, r)
-        except Exception, e:
+        except RestException, e:
             adapter_klass = self.get_adapter_for_type(format_type)
             response, content_type, status_code = adapter_klass.format_exception(e)
             return Response(response=response, content_type=content_type, status=status_code)
-        
+
         return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
                         content_type=adapter.extra_headers['Content-Type'], status=adapter.status_code)
 
