@@ -38,7 +38,7 @@ class FlaskDispatcher(DispatcherBase):
     @property
     def base_url(self):
         # TODO this is a temp fix
-        # It will break with multiple dispatchers working together.
+        # TODO It will break with multiple dispatchers working together.
         return join_url_parts(request.url_root, self.url_prefix)
 
     def register_route(self, endpoint, endpoint_func=None, route=None, methods=None, **options):
@@ -89,6 +89,15 @@ class FlaskDispatcher(DispatcherBase):
         endpoint_func = self.function_for_endpoint[endpoint]
         r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=dict(request.form),
                              headers=request.headers)
-        adapter = self.dispatch(endpoint_func, request.content_type, r)
-        response = Response(response=adapter.formatted_body, headers=adapter.extra_headers, content_type=adapter.extra_headers['Content-Type'])
-        return adapter.formatted_body
+        format_type = request.content_type
+        try:
+            adapter = self.dispatch(endpoint_func, format_type, r)
+        except Exception, e:
+            adapter_klass = self.get_adapter_for_type(format_type)
+            response, content_type, status_code = adapter_klass.format_exception(e)
+            return Response(response=response, content_type=content_type, status=status_code)
+        
+        return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
+                        content_type=adapter.extra_headers['Content-Type'], status=adapter.status_code)
+
+
