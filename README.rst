@@ -28,19 +28,6 @@ This example describes a minimal flask-ripozo application.
     from ripozo.dispatcher.adapters import SirenAdapter, HalAdapter
     from ripozo.viewsets.resource_base import ResourceBase
 
-    from ripozo_tests.helpers.inmemory_manager import InMemoryManager
-
-
-    class Manager(InMemoryManager):
-        # This is just for test purposes.
-        # In real applications you would want to use
-        # something like ripozo-sqlalchemy to actually
-        # manage your models.  Also in future
-        # versions of ripozo a Manager class will
-        # not be required for a Resource class
-        model = 'SomeModel'
-        _model_name = 'modelname'
-
 
     class HelloWorldViewset(ResourceBase):
         _resource_name = 'myresource'     # The name of the resource.  This will be appended to
@@ -55,8 +42,8 @@ This example describes a minimal flask-ripozo application.
             faked_response_properties = {'content': 'hello world'}
             return cls(properties=filters)
 
-
-    app = Flask(__name__)  # Create the flask application
+    # Create the flask application
+    app = Flask(__name__)
 
     # Create the dispatcher
     dispatcher = FlaskDispatcher(app, base_url='/api')
