@@ -5,6 +5,8 @@ from __future__ import unicode_literals
 
 from flask import request, Response
 
+from functools import wraps
+
 from ripozo.dispatch.dispatch_base import DispatcherBase
 from ripozo.exceptions import RestException
 from ripozo.utilities import join_url_parts
@@ -57,48 +59,50 @@ class FlaskDispatcher(DispatcherBase):
         :param list methods: The http verbs that can be used with this endpoint
         :param dict options: The additional options to pass to the add_url_rule
         """
-        # TODO why the None?
         # TODO this is a temp fix
         # It will break with multiple dispatchers working together.
         route = join_url_parts(self.url_prefix, route)
-        self.app.add_url_rule(route, None, self.flask_dispatch, methods=methods, **options)
-        self.url_map.add(Rule(route, endpoint=endpoint, methods=methods))
-        self.function_for_endpoint[endpoint] = endpoint_func
+        self.app.add_url_rule(route, endpoint=endpoint,
+                              view_func=self.flask_dispatch_wrapper(endpoint_func),
+                              methods=methods, **options)
 
-    def flask_dispatch(self, **urlparams):
+    def flask_dispatch_wrapper(self, f):
         """
-        This is the method that dispatches the requests to endpoints
-        that are part of the classes registered with this dispatcher instance.
-        For example if a class Foo that has apimethods bar and baz in it and
-        that class is registered on an instance of this dispatcher, then when a
-        request that matches the route for bar or baz is caught by the flask app
-        it is first directed here.  Here it is further directs it to the appropriate
-        method (bar or baz) and an appropriate response is returned.
-
-        This effectively translates Flask's interpretation of requests and responses
-        into ripozo's interpretation of them.
-
-        :param dict urlparams:  The url params that were passed by the flask
-            app.  Typically these are going to be the _pks for the specified
-            resource.
-        :return: A response that the flask application can return.
-        :rtype: flask.Response
+        A decorator for wrapping the apimethods provided to the
+        dispatcher.
         """
-        urls = self.url_map.bind_to_environ(request.environ)
-        request_args = dict(request.args)
-        endpoint, args = urls.match(method=request.method)
-        endpoint_func = self.function_for_endpoint[endpoint]
-        r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=dict(request.form),
-                             headers=request.headers)
-        format_type = request.content_type
-        try:
-            adapter = self.dispatch(endpoint_func, format_type, r)
-        except RestException, e:
-            adapter_klass = self.get_adapter_for_type(format_type)
-            response, content_type, status_code = adapter_klass.format_exception(e)
-            return Response(response=response, content_type=content_type, status=status_code)
 
-        return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
-                        content_type=adapter.extra_headers['Content-Type'], status=adapter.status_code)
+        @wraps(f)
+        def flask_dispatch(**urlparams):
+            """
+            This is the method that dispatches the requests to endpoints
+            that are part of the classes registered with this dispatcher instance.
+            For example if a class Foo that has apimethods bar and baz in it and
+            that class is registered on an instance of this dispatcher, then when a
+            request that matches the route for bar or baz is caught by the flask app
+            it is first directed here.  Here it is further directs it to the appropriate
+            method (bar or baz) and an appropriate response is returned.
 
+            This effectively translates Flask's interpretation of requests and responses
+            into ripozo's interpretation of them.
 
+            :param dict urlparams:  The url params that were passed by the flask
+                app.  Typically these are going to be the _pks for the specified
+                resource.
+            :return: A response that the flask application can return.
+            :rtype: flask.Response
+            """
+            request_args = dict(request.args)
+            r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=dict(request.form),
+                                 headers=request.headers)
+            format_type = request.content_type
+            try:
+                adapter = self.dispatch(f, format_type, r)
+            except RestException, e:
+                adapter_klass = self.get_adapter_for_type(format_type)
+                response, content_type, status_code = adapter_klass.format_exception(e)
+                return Response(response=response, content_type=content_type, status=status_code)
+
+            return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
+                            content_type=adapter.extra_headers['Content-Type'], status=adapter.status_code)
+        return flask_dispatch
