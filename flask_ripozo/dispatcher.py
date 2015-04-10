@@ -12,7 +12,7 @@ from ripozo.exceptions import RestException
 from ripozo.utilities import join_url_parts
 from ripozo.viewsets.request import RequestContainer
 
-from werkzeug.routing import Rule, Map
+from werkzeug.routing import Map
 
 
 class FlaskDispatcher(DispatcherBase):
@@ -40,6 +40,12 @@ class FlaskDispatcher(DispatcherBase):
 
     @property
     def base_url(self):
+        """
+        :return: The base_url for this adapter.  It simply joins
+            the provided base_url in the __init__ method and
+            joins it with the ``request.url_root``.
+        :rtype: unicode
+        """
         # TODO this is a temp fix
         # TODO It will break with multiple dispatchers working together.
         return join_url_parts(request.url_root, self.url_prefix)
