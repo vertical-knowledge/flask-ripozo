@@ -1,12 +1,25 @@
 flask-ripozo
 ============
 
-.. image:: https://travis-ci.org/vertical-knowledge/flask-ripozo.svg?branch=master
+.. image:: https://travis-ci.org/vertical-knowledge/flask-ripozo.svg?branch=master&style=flat
     :target: https://travis-ci.org/vertical-knowledge/flask-ripozo
 
-.. image:: https://readthedocs.org/projects/flask-ripozo/badge/?version=latest
+.. image:: https://coveralls.io/repos/vertical-knowledge/flask-ripozo/badge.svg?branch=master&style=flat
+  :target: https://coveralls.io/r/vertical-knowledge/flask-ripozo?branch=master
+
+.. image:: https://readthedocs.org/projects/flask-ripozo/badge/?version=latest&style=flat
     :target: https://flask-ripozo.readthedocs.org/
     :alt: Documentation Status
+
+.. image:: https://pypip.in/version/flask-ripozo/badge.svg?style=flat
+    :target: https://pypi.python.org/pypi/flask-ripozo/
+
+.. image:: https://pypip.in/d/flask-ripozo/badge.png?style=flat
+    :target: https://crate.io/packages/flask-ripozo/
+    :alt: Number of PyPI downloads
+
+.. image:: https://pypip.in/py_versions/flask-ripozo/badge.svg?style=flat
+    :target: https://pypi.python.org/pypi/flask-ripozo/
 
 This package provides a dispatcher for ripozo so that you can
 integrate ripozo with Flask.  As with all dispatchers it is simply
