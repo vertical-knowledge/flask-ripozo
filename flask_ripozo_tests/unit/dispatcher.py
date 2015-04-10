@@ -8,12 +8,13 @@ from flask import Flask
 from flask_ripozo.dispatcher import FlaskDispatcher
 
 from ripozo.exceptions import RestException
+from ripozo_tests.python2base import TestBase
 
 import mock
 import unittest
 
 
-class TestFlaskDispatcher(unittest.TestCase):
+class TestFlaskDispatcher(TestBase, unittest.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
 
@@ -42,7 +43,7 @@ class TestFlaskDispatcher(unittest.TestCase):
         self.assertEqual(endpoint, rule.endpoint)
 
         # They won't actually be the same function since it gets wrapped.
-        self.assertEqual(self.app.view_functions[endpoint].func_name, fake.func_name)
+        self.assertEqual(self.app.view_functions[endpoint].__name__, fake.__name__)
 
     def test_flask_dispatch_wrapper(self):
         """
@@ -62,7 +63,7 @@ class TestFlaskDispatcher(unittest.TestCase):
             response = view_func()
             self.assertEqual(response.content_type, 'fake')
             self.assertEqual(response.status_code, 600)
-            self.assertEqual(response.data, 'some body')
+            self.assertEqual(response.data.decode('utf8'), 'some body')
 
     def test_flask_dispatch_wrapper_fail_restexception(self):
         """
@@ -82,7 +83,7 @@ class TestFlaskDispatcher(unittest.TestCase):
         with self.app.test_request_context('/myresource'):
             response = view_func()
             self.assertEqual(response.status_code, 500)
-            self.assertEqual(response.data, 'error')
+            self.assertEqual(response.data.decode('utf8'), 'error')
             self.assertEqual(response.content_type, 'fake')
 
     def test_flask_dispatch_wrapper_fail(self):

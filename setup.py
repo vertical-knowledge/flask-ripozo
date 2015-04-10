@@ -35,6 +35,7 @@ setup(
     tests_require=[
         'mock',
         'ripozo-tests',
+        'six',
         'tox'
     ],
     url='http://flask-ripozo.readthedocs.org/',
