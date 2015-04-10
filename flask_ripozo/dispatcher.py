@@ -98,7 +98,7 @@ class FlaskDispatcher(DispatcherBase):
             format_type = request.content_type
             try:
                 adapter = self.dispatch(f, format_type, r)
-            except RestException, e:
+            except RestException as e:
                 adapter_klass = self.get_adapter_for_type(format_type)
                 response, content_type, status_code = adapter_klass.format_exception(e)
                 return Response(response=response, content_type=content_type, status=status_code)
