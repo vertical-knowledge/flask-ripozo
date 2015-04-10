@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from flask import Flask
+from flask import Flask, Blueprint
 
 from flask_ripozo.dispatcher import FlaskDispatcher
 
@@ -102,3 +102,38 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
 
         with self.app.test_request_context('/myresource'):
             self.assertRaises(Exception, view_func)
+
+    def test_base_url(self):
+        """
+        Tests that the base_url always returns the
+        correct shit.
+        """
+        app = Flask('myapp')
+        d = FlaskDispatcher(app)
+
+        with app.test_request_context():
+            self.assertEqual(d.base_url, 'http://localhost/')
+
+        d = FlaskDispatcher(app, url_prefix='someprefix')
+        with app.test_request_context():
+            self.assertEqual(d.base_url, 'http://localhost/someprefix')
+
+    def test_blueprint_base_url(self):
+        """
+        Tests that dispatcher return the right shit
+        when a blueprint is passed in.
+        """
+        with self.app.test_request_context():
+            bp = Blueprint('name', __name__)
+            d = FlaskDispatcher(bp)
+            self.assertEqual(d.base_url, 'http://localhost/')
+
+            d = FlaskDispatcher(bp, url_prefix='someprefix')
+            self.assertEqual(d.base_url, 'http://localhost/someprefix')
+
+            bp2 = Blueprint('name', __name__, url_prefix='another')
+            d = FlaskDispatcher(bp2)
+            self.assertEqual(d.base_url, 'http://localhost/another/')
+
+            d = FlaskDispatcher(bp2, url_prefix='again')
+            self.assertEqual(d.base_url, 'http://localhost/another/again')

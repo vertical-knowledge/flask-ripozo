@@ -26,7 +26,7 @@ class FlaskDispatcher(DispatcherBase):
         Eventually these will be able to be registed to a blueprint.
         But for now it will probably break the routing by the adapters.
 
-        :param flask.Flask app: The flask app that is responsible for
+        :param flask.Flask|flask.Blueprint app: The flask app that is responsible for
             handling the web application.
         :param unicode url_prefix: The url prefix will be prepended to
             every route that is registered on this dispatcher.  It is
@@ -43,18 +43,23 @@ class FlaskDispatcher(DispatcherBase):
         """
         :return: The base_url for this adapter.  It simply joins
             the provided base_url in the __init__ method and
-            joins it with the ``request.url_root``.
+            joins it with the ``request.url_root``.  If this
+            app provided is actually a blueprint, it will
+            return join the blueprints url_prefix in between
         :rtype: unicode
         """
-        # TODO this is a temp fix
-        # TODO It will break with multiple dispatchers working together.
+        if getattr(self.app, 'url_prefix', None):
+            return join_url_parts(request.url_root, self.app.url_prefix, self.url_prefix)
         return join_url_parts(request.url_root, self.url_prefix)
 
     def register_route(self, endpoint, endpoint_func=None, route=None, methods=None, **options):
         """
         Registers the endpoints on the flask application
         or blueprint.  It does so by using the add_url_rule on
-        the blueprint/app.
+        the blueprint/app.  It wraps the endpoint_func with the
+        ``flask_dispatch_wrapper`` which returns an updated function.
+        This function appropriately sets the RequestContainer object
+        before passing it to the apimethod.
 
         :param unicode endpoint: The name of the endpoint.  This is typically
             used in flask for reversing urls
@@ -65,8 +70,6 @@ class FlaskDispatcher(DispatcherBase):
         :param list methods: The http verbs that can be used with this endpoint
         :param dict options: The additional options to pass to the add_url_rule
         """
-        # TODO this is a temp fix
-        # It will break with multiple dispatchers working together.
         route = join_url_parts(self.url_prefix, route)
         self.app.add_url_rule(route, endpoint=endpoint,
                               view_func=self.flask_dispatch_wrapper(endpoint_func),
