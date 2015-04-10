@@ -56,7 +56,7 @@ class TestFlaskDispatcher(unittest.TestCase):
         d = FlaskDispatcher(self.app)
         d.register_adapters(adapter_class)
         view_func = d.flask_dispatch_wrapper(fake)
-        self.assertEqual(view_func.func_name, fake.func_name)
+        self.assertEqual(view_func.__name__, fake.__name__)
 
         with self.app.test_request_context('/myresource'):
             response = view_func()
@@ -77,7 +77,7 @@ class TestFlaskDispatcher(unittest.TestCase):
         d = FlaskDispatcher(self.app)
         d.register_adapters(adapter_class)
         view_func = d.flask_dispatch_wrapper(fake)
-        self.assertEqual(view_func.func_name, fake.func_name)
+        self.assertEqual(view_func.__name__, fake.__name__)
 
         with self.app.test_request_context('/myresource'):
             response = view_func()
@@ -97,7 +97,7 @@ class TestFlaskDispatcher(unittest.TestCase):
         d = FlaskDispatcher(self.app)
         d.register_adapters(adapter_class)
         view_func = d.flask_dispatch_wrapper(fake)
-        self.assertEqual(view_func.func_name, fake.func_name)
+        self.assertEqual(view_func.__name__, fake.__name__)
 
         with self.app.test_request_context('/myresource'):
             self.assertRaises(Exception, view_func)
