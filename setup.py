@@ -34,7 +34,6 @@ setup(
     test_suite='flask_ripozo_tests',
     tests_require=[
         'mock',
-        'ripozo-tests',
         'six',
         'tox'
     ],
