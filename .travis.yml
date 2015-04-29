@@ -6,8 +6,12 @@ python:
   - "2.6"
   - "pypy"
   - "pypy3"
+env:
+  - RIPOZO="ripozo"
+  - RIPOZO="git+git://github.com/vertical-knowledge/ripozo.git@master"
 install:
   - pip install coveralls
+  - pip install -U $RIPOZO
   - python setup.py -q install
 script:
   coverage run --source=flask_ripozo setup.py test
