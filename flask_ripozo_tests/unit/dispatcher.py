@@ -8,7 +8,7 @@ from flask import Flask, Blueprint
 from flask_ripozo.dispatcher import FlaskDispatcher
 
 from ripozo.exceptions import RestException
-from ripozo_tests.python2base import TestBase
+from ripozo.tests.python2base import TestBase
 
 import mock
 import unittest
