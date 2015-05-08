@@ -14,6 +14,9 @@ from ripozo.viewsets.request import RequestContainer
 
 from werkzeug.routing import Map
 
+import json
+import six
+
 
 class FlaskDispatcher(DispatcherBase):
     """
@@ -70,7 +73,16 @@ class FlaskDispatcher(DispatcherBase):
         :param list methods: The http verbs that can be used with this endpoint
         :param dict options: The additional options to pass to the add_url_rule
         """
+        valid_flask_options = ('defaults', 'subdomain', 'methods', 'build_only',
+                               'endpoint', 'strict_slashes', 'redirect_to',
+                               'alias', 'host')
         route = join_url_parts(self.url_prefix, route)
+
+        # Remove invalid flask options.
+        options_copy = options.copy()
+        for key, value in six.iteritems(options_copy):
+            if key not in valid_flask_options:
+                options.pop(key, None)
         self.app.add_url_rule(route, endpoint=endpoint,
                               view_func=self.flask_dispatch_wrapper(endpoint_func),
                               methods=methods, **options)
@@ -102,7 +114,11 @@ class FlaskDispatcher(DispatcherBase):
             :rtype: flask.Response
             """
             request_args = dict(request.args)
-            r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=dict(request.form),
+            # TODO What the fuck.
+            body_args = dict(request.form) or dict(request.json or {})
+            if not body_args and request.data:
+                body_args = json.loads(request.data)
+            r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=body_args,
                                  headers=request.headers)
             format_type = request.content_type
             try:
