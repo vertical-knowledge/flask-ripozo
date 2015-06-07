@@ -7,7 +7,7 @@
 0.1.4 (2015-05-08)
 ==================
 
-- Nothing changed yet.
+- Using Accept-Type instead of Content-Type to get the appropriate adapter.
 
 
 0.1.3 (2015-04-28)
