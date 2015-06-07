@@ -5,11 +5,12 @@ from __future__ import unicode_literals
 
 from flask import Flask, Blueprint
 
-from flask_ripozo.dispatcher import FlaskDispatcher
+from flask_ripozo.dispatcher import FlaskDispatcher, flask_dispatch_wrapper, _get_request_query_body_args
 
 from ripozo.exceptions import RestException
 from ripozo.tests.python2base import TestBase
 
+import json
 import mock
 import unittest
 
@@ -56,7 +57,7 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
 
         d = FlaskDispatcher(self.app)
         d.register_adapters(adapter_class)
-        view_func = d.flask_dispatch_wrapper(fake)
+        view_func = flask_dispatch_wrapper(d, fake)
         self.assertEqual(view_func.__name__, fake.__name__)
 
         with self.app.test_request_context('/myresource'):
@@ -77,7 +78,7 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
 
         d = FlaskDispatcher(self.app)
         d.register_adapters(adapter_class)
-        view_func = d.flask_dispatch_wrapper(fake)
+        view_func = flask_dispatch_wrapper(d, fake)
         self.assertEqual(view_func.__name__, fake.__name__)
 
         with self.app.test_request_context('/myresource'):
@@ -97,7 +98,7 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
 
         d = FlaskDispatcher(self.app)
         d.register_adapters(adapter_class)
-        view_func = d.flask_dispatch_wrapper(fake)
+        view_func = flask_dispatch_wrapper(d, fake)
         self.assertEqual(view_func.__name__, fake.__name__)
 
         with self.app.test_request_context('/myresource'):
@@ -137,3 +138,40 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
 
             d = FlaskDispatcher(bp2, url_prefix='again')
             self.assertEqual(d.base_url, 'http://localhost/another/again')
+
+    def test_get_request_query_body_args(self):
+        """
+        Tests the private _get_request_query_body_args
+        method.
+        """
+        query_args = dict(x=1)
+        form = dict(x=2)
+        mck = mock.Mock(args=query_args, form=form)
+        q, b = _get_request_query_body_args(mck)
+        self.assertDictEqual(query_args, q)
+        self.assertDictEqual(form, b)
+
+        mck = mock.MagicMock(args=query_args, form=None, json=form)
+        q, b = _get_request_query_body_args(mck)
+        self.assertDictEqual(query_args, q)
+        self.assertDictEqual(form, b)
+
+        mck = mock.MagicMock(args=query_args, form=None, json=None, data=json.dumps(form))
+        q, b = _get_request_query_body_args(mck)
+        self.assertDictEqual(query_args, q)
+        self.assertDictEqual(form, b)
+
+    def test_register_route_invalid_options(self):
+        """
+        Tests registering a route with options not accepted
+        by Flask.
+        """
+        app = Flask('myapp')
+        d = FlaskDispatcher(app)
+        def fake(): return
+        d.register_route('/ha', route='/ha', endpoint_func=fake, options=dict(invalid='option'))
+        for rul in app.url_map._rules:
+            if rul.endpoint == '/ha':
+                break
+        else:
+            assert False

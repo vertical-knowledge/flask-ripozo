@@ -18,13 +18,32 @@ import json
 import six
 
 
+def exception_handler(dispatcher, accepted_mimetypes, exc):
+    """
+    Responsible for handling exceptions in the project.
+
+    :param FlaskDispatcher dispatcher: A FlaskDispatcher instance
+        used to format the exception
+    :param list accepted_mimetypes: A list of the accepted mimetypes
+        for the client.
+    :param Exception exc: The exception that was raised.
+    :return: A flask Response object.
+    :rtype: Response
+    """
+    if isinstance(exc, RestException):
+        adapter_klass = dispatcher.get_adapter_for_type(accepted_mimetypes)
+        response, content_type, status_code = adapter_klass.format_exception(exc)
+        return Response(response=response, content_type=content_type, status=status_code)
+    raise exc
+
+
 class FlaskDispatcher(DispatcherBase):
     """
     This is the actual dispatcher responsible for integrating
     ripozo with flask.  Pretty simple right?
     """
 
-    def __init__(self, app, url_prefix=''):
+    def __init__(self, app, url_prefix='', error_handler=exception_handler):
         """
         Eventually these will be able to be registed to a blueprint.
         But for now it will probably break the routing by the adapters.
@@ -35,11 +54,14 @@ class FlaskDispatcher(DispatcherBase):
             every route that is registered on this dispatcher.  It is
             helpful if, for example, you want to expose your api
             on the '/api' path.
+        :param function error_handler: A function that takes a dispatcher,
+            accepted_mimetypes, and exception that handles error responses.
         """
         self.app = app
         self.url_map = Map()
         self.function_for_endpoint = {}
         self.url_prefix = url_prefix
+        self.error_handler = error_handler
 
     @property
     def base_url(self):
@@ -84,50 +106,64 @@ class FlaskDispatcher(DispatcherBase):
             if key not in valid_flask_options:
                 options.pop(key, None)
         self.app.add_url_rule(route, endpoint=endpoint,
-                              view_func=self.flask_dispatch_wrapper(endpoint_func),
+                              view_func=flask_dispatch_wrapper(self, endpoint_func),
                               methods=methods, **options)
 
-    def flask_dispatch_wrapper(self, f):
+def flask_dispatch_wrapper(dispatcher, f):
+    """
+    A decorator for wrapping the apimethods provided to the
+    dispatcher.
+    """
+
+    @wraps(f)
+    def flask_dispatch(**urlparams):
         """
-        A decorator for wrapping the apimethods provided to the
-        dispatcher.
+        This is the method that dispatches the requests to endpoints
+        that are part of the classes registered with this dispatcher instance.
+        For example if a class Foo that has apimethods bar and baz in it and
+        that class is registered on an instance of this dispatcher, then when a
+        request that matches the route for bar or baz is caught by the flask app
+        it is first directed here.  Here it is further directs it to the appropriate
+        method (bar or baz) and an appropriate response is returned.
+
+        This effectively translates Flask's interpretation of requests and responses
+        into ripozo's interpretation of them.
+
+        :param dict urlparams:  The url params that were passed by the flask
+            app.  Typically these are going to be the _pks for the specified
+            resource.
+        :return: A response that the flask application can return.
+        :rtype: flask.Response
         """
+        request_args, body_args = _get_request_query_body_args(request)
+        r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=body_args,
+                             headers=request.headers)
+        accepted_mimetypes = request.accept_mimetypes
+        try:
+            adapter = dispatcher.dispatch(f, accepted_mimetypes, r)
+        except Exception as e:
+            return dispatcher.error_handler(dispatcher, accepted_mimetypes, e)
 
-        @wraps(f)
-        def flask_dispatch(**urlparams):
-            """
-            This is the method that dispatches the requests to endpoints
-            that are part of the classes registered with this dispatcher instance.
-            For example if a class Foo that has apimethods bar and baz in it and
-            that class is registered on an instance of this dispatcher, then when a
-            request that matches the route for bar or baz is caught by the flask app
-            it is first directed here.  Here it is further directs it to the appropriate
-            method (bar or baz) and an appropriate response is returned.
+        return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
+                        content_type=adapter.extra_headers['Content-Type'], status=adapter.status_code)
+    return flask_dispatch
 
-            This effectively translates Flask's interpretation of requests and responses
-            into ripozo's interpretation of them.
 
-            :param dict urlparams:  The url params that were passed by the flask
-                app.  Typically these are going to be the _pks for the specified
-                resource.
-            :return: A response that the flask application can return.
-            :rtype: flask.Response
-            """
-            request_args = dict(request.args)
-            # TODO What the fuck.
-            body_args = dict(request.form) or dict(request.json or {})
-            if not body_args and request.data:
-                body_args = json.loads(request.data)
-            r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=body_args,
-                                 headers=request.headers)
-            format_type = request.content_type
-            try:
-                adapter = self.dispatch(f, format_type, r)
-            except RestException as e:
-                adapter_klass = self.get_adapter_for_type(format_type)
-                response, content_type, status_code = adapter_klass.format_exception(e)
-                return Response(response=response, content_type=content_type, status=status_code)
+def _get_request_query_body_args(request_obj):
+    """
+    Gets the request query args and the
+    body arguments.
 
-            return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
-                            content_type=adapter.extra_headers['Content-Type'], status=adapter.status_code)
-        return flask_dispatch
+    :param Request request_obj: A Flask request object.
+    :return: A tuple of the appropriately formatted query args and body args
+    :rtype: dict, dict
+    """
+    query_args = dict(request_obj.args)
+    # TODO What the fuck.
+    if request_obj.form:
+        return query_args, dict(request_obj.form)
+    elif request_obj.json:
+        return query_args, dict(request_obj.json)
+    elif request_obj.data:
+        return query_args, json.loads(request_obj.data)
+    return query_args, {}
