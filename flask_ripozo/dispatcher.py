@@ -109,6 +109,7 @@ class FlaskDispatcher(DispatcherBase):
                               view_func=flask_dispatch_wrapper(self, endpoint_func),
                               methods=methods, **options)
 
+
 def flask_dispatch_wrapper(dispatcher, f):
     """
     A decorator for wrapping the apimethods provided to the
