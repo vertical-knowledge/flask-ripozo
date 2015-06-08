@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 from flask import Flask, Blueprint
 
-from flask_ripozo.dispatcher import FlaskDispatcher, flask_dispatch_wrapper, _get_request_query_body_args
+from flask_ripozo.dispatcher import FlaskDispatcher, flask_dispatch_wrapper, get_request_query_body_args
 
 from ripozo.exceptions import RestException
 from ripozo.tests.python2base import TestBase
@@ -141,25 +141,25 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
 
     def test_get_request_query_body_args(self):
         """
-        Tests the private _get_request_query_body_args
+        Tests the private get_request_query_body_args
         method.
         """
         query_args = dict(x=1)
         form = dict(x=2)
-        mck = mock.Mock(args=query_args, form=form)
-        q, b = _get_request_query_body_args(mck)
+        mck = mock.Mock(args=query_args, form=form, get_json=mock.Mock(return_value=None))
+        q, b = get_request_query_body_args(mck)
         self.assertDictEqual(query_args, q)
         self.assertDictEqual(form, b)
 
-        mck = mock.MagicMock(args=query_args, form=None, json=form)
-        q, b = _get_request_query_body_args(mck)
+        mck = mock.MagicMock(args=query_args, form=None, get_json=mock.Mock(return_value=form))
+        q, b = get_request_query_body_args(mck)
         self.assertDictEqual(query_args, q)
         self.assertDictEqual(form, b)
 
-        mck = mock.MagicMock(args=query_args, form=None, json=None, data=json.dumps(form))
-        q, b = _get_request_query_body_args(mck)
+        mck = mock.MagicMock(args=query_args, form=None, get_json=mock.Mock(return_value=None), data=json.dumps(form))
+        q, b = get_request_query_body_args(mck)
         self.assertDictEqual(query_args, q)
-        self.assertDictEqual(form, b)
+        self.assertDictEqual({}, b)
 
     def test_register_route_invalid_options(self):
         """

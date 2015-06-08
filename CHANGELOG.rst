@@ -1,7 +1,7 @@
 0.1.5 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Injected argument getter.  No longer attempts to automatically load json from the data.
 
 
 0.1.4 (2015-05-08)

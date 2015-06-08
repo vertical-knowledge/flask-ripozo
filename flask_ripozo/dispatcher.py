@@ -14,7 +14,6 @@ from ripozo.viewsets.request import RequestContainer
 
 from werkzeug.routing import Map
 
-import json
 import six
 
 
@@ -37,13 +36,28 @@ def exception_handler(dispatcher, accepted_mimetypes, exc):
     raise exc
 
 
+def get_request_query_body_args(request_obj):
+    """
+    Gets the request query args and the
+    body arguments.
+
+    :param Request request_obj: A Flask request object.
+    :return: A tuple of the appropriately formatted query args and body args
+    :rtype: dict, dict
+    """
+    query_args = dict(request_obj.args)
+    body = request_obj.get_json() or request_obj.form or {}
+    return query_args, body
+
+
 class FlaskDispatcher(DispatcherBase):
     """
     This is the actual dispatcher responsible for integrating
     ripozo with flask.  Pretty simple right?
     """
 
-    def __init__(self, app, url_prefix='', error_handler=exception_handler):
+    def __init__(self, app, url_prefix='', error_handler=exception_handler,
+                 argument_getter=get_request_query_body_args):
         """
         Eventually these will be able to be registed to a blueprint.
         But for now it will probably break the routing by the adapters.
@@ -56,12 +70,16 @@ class FlaskDispatcher(DispatcherBase):
             on the '/api' path.
         :param function error_handler: A function that takes a dispatcher,
             accepted_mimetypes, and exception that handles error responses.
+        :param function argument_getter:  The function responsible for
+            getting the query/body arguments from the Flask Request as a
+            tuple.
         """
         self.app = app
         self.url_map = Map()
         self.function_for_endpoint = {}
         self.url_prefix = url_prefix
         self.error_handler = error_handler
+        self.argument_getter = argument_getter
 
     @property
     def base_url(self):
@@ -106,14 +124,22 @@ class FlaskDispatcher(DispatcherBase):
             if key not in valid_flask_options:
                 options.pop(key, None)
         self.app.add_url_rule(route, endpoint=endpoint,
-                              view_func=flask_dispatch_wrapper(self, endpoint_func),
+                              view_func=flask_dispatch_wrapper(self, endpoint_func, self.argument_getter),
                               methods=methods, **options)
 
 
-def flask_dispatch_wrapper(dispatcher, f):
+
+def flask_dispatch_wrapper(dispatcher, f, argument_getter=get_request_query_body_args):
     """
     A decorator for wrapping the apimethods provided to the
     dispatcher.
+
+    :param FlaskDispatcher dispatcher:  The dispatcher that is
+        created this.
+    :param function f:  The apimethod to wrap.
+    :param function argument_getter:  The function that takes a flask
+        Request object and uses it to get the query arguments and the
+        body arguments as a tuple.
     """
 
     @wraps(f)
@@ -136,7 +162,7 @@ def flask_dispatch_wrapper(dispatcher, f):
         :return: A response that the flask application can return.
         :rtype: flask.Response
         """
-        request_args, body_args = _get_request_query_body_args(request)
+        request_args, body_args = argument_getter(request)
         r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=body_args,
                              headers=request.headers)
         accepted_mimetypes = request.accept_mimetypes
@@ -148,23 +174,3 @@ def flask_dispatch_wrapper(dispatcher, f):
         return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
                         content_type=adapter.extra_headers['Content-Type'], status=adapter.status_code)
     return flask_dispatch
-
-
-def _get_request_query_body_args(request_obj):
-    """
-    Gets the request query args and the
-    body arguments.
-
-    :param Request request_obj: A Flask request object.
-    :return: A tuple of the appropriately formatted query args and body args
-    :rtype: dict, dict
-    """
-    query_args = dict(request_obj.args)
-    # TODO What the fuck.
-    if request_obj.form:
-        return query_args, dict(request_obj.form)
-    elif request_obj.json:
-        return query_args, dict(request_obj.json)
-    elif request_obj.data:
-        return query_args, json.loads(request_obj.data)
-    return query_args, {}
