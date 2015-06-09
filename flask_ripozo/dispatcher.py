@@ -47,6 +47,7 @@ def get_request_query_body_args(request_obj):
     """
     query_args = dict(request_obj.args)
     body = request_obj.get_json() or request_obj.form or {}
+    body = dict(body)
     return query_args, body
 
 
