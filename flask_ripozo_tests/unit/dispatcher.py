@@ -8,14 +8,13 @@ from flask import Flask, Blueprint
 from flask_ripozo.dispatcher import FlaskDispatcher, flask_dispatch_wrapper, get_request_query_body_args
 
 from ripozo.exceptions import RestException
-from ripozo.tests.python2base import TestBase
 
 import json
 import mock
-import unittest
+import unittest2
 
 
-class TestFlaskDispatcher(TestBase, unittest.TestCase):
+class TestFlaskDispatcher(unittest2.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
 
@@ -31,6 +30,7 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
 
     def test_register_route(self):
         d = FlaskDispatcher(self.app)
+
         def fake():
             pass
         endpoint = 'someendpoint'
@@ -52,6 +52,7 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
         apimethod
         """
         adapter_class = self.get_mock_adapter_class()
+
         def fake(*args, **kwargs):
             return mock.Mock()
 
@@ -73,6 +74,7 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
         is raised.
         """
         adapter_class = self.get_mock_adapter_class()
+
         def fake(*args, **kwargs):
             raise RestException
 
@@ -93,6 +95,7 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
         dispatching a request that is not a RestException
         """
         adapter_class = self.get_mock_adapter_class()
+
         def fake(*args, **kwargs):
             raise Exception
 
@@ -168,7 +171,10 @@ class TestFlaskDispatcher(TestBase, unittest.TestCase):
         """
         app = Flask('myapp')
         d = FlaskDispatcher(app)
-        def fake(): return
+
+        def fake():
+            return
+
         d.register_route('/ha', route='/ha', endpoint_func=fake, options=dict(invalid='option'))
         for rul in app.url_map._rules:
             if rul.endpoint == '/ha':

@@ -7,13 +7,11 @@ from flask import Flask, request
 
 from flask_ripozo.dispatcher import get_request_query_body_args
 
-from ripozo.tests.python2base import TestBase
-
 import json
-import unittest
+import unittest2
 
 
-class TestDispatcherFlaskIntegration(unittest.TestCase, TestBase):
+class TestDispatcherFlaskIntegration(unittest2.TestCase):
     def test_get_request_body_args(self):
         """
         Tests getting the request body args

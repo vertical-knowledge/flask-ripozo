@@ -33,6 +33,7 @@ setup(
     packages=find_packages(exclude=['tests', 'tests.*']),
     test_suite='flask_ripozo_tests',
     tests_require=[
+        'unittest2',
         'mock',
         'six',
         'tox'
