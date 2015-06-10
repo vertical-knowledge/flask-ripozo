@@ -25,6 +25,14 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     description='An extension for ripozo and that brings HATEOAS/REST/Hypermedia apis to flask',
+    extras_require={
+        'examples': [
+            'flask-ripozo',
+            'Flask-SQLAlchemy',
+            'pypermedia',
+            'ripozo-sqlalchemy'
+        ]
+    },
     install_requires=[
         'ripozo',
         'Flask'
