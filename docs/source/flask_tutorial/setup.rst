@@ -1,5 +1,5 @@
-Flask Tutorial 1: Setting up the app
-====================================
+Setting up the app
+==================
 
 In this tutorial we will create a todo list
 application.  We will be using,
@@ -12,7 +12,7 @@ course.
 
 .. code-block:: bash
 
-    pip install flask-ripozo, ripozo-sqlalchemy, Flask-User
+    pip install flask-ripozo, ripozo-sqlalchemy, Flask-SQLAlchemy
 
 Setting up the Flask application
 --------------------------------
