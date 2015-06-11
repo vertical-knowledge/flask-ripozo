@@ -9,9 +9,10 @@ Welcome to flask-ripozo's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   ./API/flask_ripozo.rst
+    ./API/flask_ripozo.rst
+    ./flask_tutorial
 
 .. include:: ../../README.rst
 
