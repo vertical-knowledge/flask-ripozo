@@ -12,7 +12,7 @@ Contents:
     :maxdepth: 2
 
     ./API/flask_ripozo.rst
-    ./flask_tutorial
+    ./flask_tutorial/index.rst
 
 .. include:: ../../README.rst
 
