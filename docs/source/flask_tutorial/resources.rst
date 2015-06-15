@@ -11,7 +11,6 @@ manager.
 
     from ripozo import restmixins, ListRelationship, Relationship
 
-
     class TaskBoardResource(restmixins.CreateRetrieveRetrieveListUpdateDelete):
         manager = TaskBoardManager(session_handler)
         _resource_name = 'taskboard'

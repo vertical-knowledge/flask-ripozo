@@ -1,7 +1,7 @@
 flask-ripozo API
 ================
 
-.. autoclass:: flask_ripozo.dispatcher.FlaskDispatcher
+.. automodule:: flask_ripozo.dispatcher
     :members:
     :undoc-members:
     :show-inheritance:

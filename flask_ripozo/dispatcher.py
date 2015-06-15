@@ -10,7 +10,7 @@ from functools import wraps
 from ripozo.dispatch.dispatch_base import DispatcherBase
 from ripozo.exceptions import RestException
 from ripozo.utilities import join_url_parts
-from ripozo.viewsets.request import RequestContainer
+from ripozo.resources.request import RequestContainer
 
 from werkzeug.routing import Map
 
@@ -20,6 +20,10 @@ import six
 def exception_handler(dispatcher, accepted_mimetypes, exc):
     """
     Responsible for handling exceptions in the project.
+    This catches any RestException (from ripozo.exceptions)
+    and calls the format_exception class method on the adapter
+    class.  It will appropriately set the status_code, response,
+    and content type for the exception.
 
     :param FlaskDispatcher dispatcher: A FlaskDispatcher instance
         used to format the exception
@@ -39,7 +43,13 @@ def exception_handler(dispatcher, accepted_mimetypes, exc):
 def get_request_query_body_args(request_obj):
     """
     Gets the request query args and the
-    body arguments.
+    body arguments.  It gets the query_args from
+    the flask request.args and transforms it from an
+    ImmutableMultiDict to a dict.  It attempts to retrieve
+    json for the body first.  If it doesn't find any it
+    looks at the form otherwise it returns an empty dictionary.
+    The body is also transformed from an ImmutableMultiDict to
+    a builtin dict.
 
     :param Request request_obj: A Flask request object.
     :return: A tuple of the appropriately formatted query args and body args
@@ -60,8 +70,8 @@ class FlaskDispatcher(DispatcherBase):
     def __init__(self, app, url_prefix='', error_handler=exception_handler,
                  argument_getter=get_request_query_body_args):
         """
-        Eventually these will be able to be registed to a blueprint.
-        But for now it will probably break the routing by the adapters.
+        Initialize the adapter.  The app can actually be either a flask.Flask
+        instance or a flask.Blueprint instance.
 
         :param flask.Flask|flask.Blueprint app: The flask app that is responsible for
             handling the web application.
@@ -71,9 +81,11 @@ class FlaskDispatcher(DispatcherBase):
             on the '/api' path.
         :param function error_handler: A function that takes a dispatcher,
             accepted_mimetypes, and exception that handles error responses.
+            It should return a flask.Response instance.
         :param function argument_getter:  The function responsible for
             getting the query/body arguments from the Flask Request as a
-            tuple.
+            tuple. This function should return (dict, dict,) with the first
+            as the query args and the second as the request body args.
         """
         self.app = app
         self.url_map = Map()
@@ -133,7 +145,13 @@ class FlaskDispatcher(DispatcherBase):
 def flask_dispatch_wrapper(dispatcher, f, argument_getter=get_request_query_body_args):
     """
     A decorator for wrapping the apimethods provided to the
-    dispatcher.
+    dispatcher.  The actual wrapper performs that actual
+    construction of the RequestContainer, determines the appropriate
+    adapter to use, dispatches the method, and passes errors to
+    the dispatcher.error_handler method. Finally, it will return
+    a flask.Response instance except in the case of an exception
+    raised by the dispatch.error_handler (typically error_handlers
+    only handle certain sets of exceptions).
 
     :param FlaskDispatcher dispatcher:  The dispatcher that is
         created this.

@@ -40,7 +40,6 @@ First we'll create a task board
 
 .. code-block:: python
 
-
     >>> siren_client = HypermediaClient.connect('http://127.0.0.1:5000/api/taskboard/', request_factory=requests.Request)
     >>> task_board_list = siren_client.retrieve_list()
     >>> created = task_board_list.create(title='My First Board')
@@ -61,6 +60,7 @@ Now we can update the board's title.
 Of course we can't have a task board without any tasks!
 
 .. code-block:: python
+
     >>> new_task = updated.add_task(title='My first task', description='I need to do something')
     >>> print(new_task.title)
     'My first task'
