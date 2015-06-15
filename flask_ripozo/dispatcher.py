@@ -73,7 +73,7 @@ class FlaskDispatcher(DispatcherBase):
         Initialize the adapter.  The app can actually be either a flask.Flask
         instance or a flask.Blueprint instance.
 
-        :param flask.Flask|flask.Blueprint app: The flask app that is responsible for
+        :param flask.Flask app: The flask app that is responsible for
             handling the web application.
         :param unicode url_prefix: The url prefix will be prepended to
             every route that is registered on this dispatcher.  It is
