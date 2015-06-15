@@ -35,4 +35,7 @@ manager.
             Relationship('task_board', property_map=dict(task_board_id='id'), relation='TaskBoardResource'),
         )
 
- Now we have a completely reusable basis for our RESTful application!
+
+We now have a reusable core to our RESTful API.  This is reusable across
+various web frameworks, databases (you will have to change the manager),
+or REST protocol.
