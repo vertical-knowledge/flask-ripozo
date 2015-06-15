@@ -31,7 +31,7 @@ def exception_handler(dispatcher, accepted_mimetypes, exc):
         for the client.
     :param Exception exc: The exception that was raised.
     :return: A flask Response object.
-    :rtype: Response
+    :rtype: flask.Response
     """
     if isinstance(exc, RestException):
         adapter_klass = dispatcher.get_adapter_for_type(accepted_mimetypes)
@@ -51,9 +51,9 @@ def get_request_query_body_args(request_obj):
     The body is also transformed from an ImmutableMultiDict to
     a builtin dict.
 
-    :param Request request_obj: A Flask request object.
+    :param flask.Request request_obj: A Flask request object.
     :return: A tuple of the appropriately formatted query args and body args
-    :rtype: dict, dict
+    :rtype: (dict, dict)
     """
     query_args = dict(request_obj.args)
     body = request_obj.get_json() or request_obj.form or {}
