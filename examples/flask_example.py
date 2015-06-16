@@ -46,11 +46,10 @@ class TaskManager(AlchemyManager):
     paginate_by = 20
 
 
-class TaskBoardResource(restmixins.CreateRetrieveRetrieveListUpdateDelete):
+class TaskBoardResource(restmixins.CRUDL):
     manager = TaskBoardManager(session_handler)
-    _resource_name = 'taskboard'
-    _indv_name = 'taskboard'
-    _pks = ('id',)
+    resource_name = 'taskboard'
+    pks = ('id',)
     _relationships = (
         ListRelationship('tasks', relation='TaskResource'),
     )
@@ -62,10 +61,10 @@ class TaskBoardResource(restmixins.CreateRetrieveRetrieveListUpdateDelete):
         request.body_args = body_args
         return TaskResource.create(request)
 
-class TaskResource(restmixins.CreateRetrieveUpdateDelete):
+class TaskResource(restmixins.CRUD):
     manager = TaskManager(session_handler)
-    _resource_name = 'task'
-    _pks = ('id',)
+    resource_name = 'task'
+    pks = ('id',)
     _relationships = (
         Relationship('task_board', property_map=dict(task_board_id='id'), relation='TaskBoardResource'),
     )
@@ -75,4 +74,4 @@ dispatcher.register_resources(TaskBoardResource, TaskResource)
 dispatcher.register_adapters(adapters.SirenAdapter, adapters.HalAdapter)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

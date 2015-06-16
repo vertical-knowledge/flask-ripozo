@@ -14,7 +14,10 @@ from ripozo.resources.request import RequestContainer
 
 from werkzeug.routing import Map
 
+import logging
 import six
+
+_logger = logging.getLogger(__name__)
 
 
 def exception_handler(dispatcher, accepted_mimetypes, exc):
@@ -188,6 +191,7 @@ def flask_dispatch_wrapper(dispatcher, f, argument_getter=get_request_query_body
         try:
             adapter = dispatcher.dispatch(f, accepted_mimetypes, r)
         except Exception as e:
+            _logger.exception(e)
             return dispatcher.error_handler(dispatcher, accepted_mimetypes, e)
 
         return Response(response=adapter.formatted_body, headers=adapter.extra_headers,
