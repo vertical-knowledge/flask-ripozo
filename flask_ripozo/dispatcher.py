@@ -7,7 +7,7 @@ from flask import request, Response
 
 from functools import wraps
 
-from ripozo.dispatch.dispatch_base import DispatcherBase
+from ripozo.dispatch_base import DispatcherBase
 from ripozo.exceptions import RestException
 from ripozo.utilities import join_url_parts
 from ripozo.resources.request import RequestContainer
