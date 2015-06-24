@@ -1,6 +1,6 @@
-********************
-flask-ripozo Example
-********************
+*********************
+flask-ripozo Tutorial
+*********************
 
 In this tutorial we will create a todo list
 application.  We will be using,
