@@ -11,8 +11,8 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
-    ./API/flask_ripozo.rst
     ./flask_tutorial.rst
+    ./API/flask_ripozo.rst
 
 .. include:: ../../README.rst
 
