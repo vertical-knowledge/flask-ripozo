@@ -14,19 +14,16 @@ flask-ripozo
     :alt: Documentation Status
 
 ..
-
     .. image:: https://pypip.in/version/flask-ripozo/badge.svg?style=flat
         :target: https://pypi.python.org/pypi/flask-ripozo/
         :alt: Version
 
 ..
-
     .. image:: https://pypip.in/d/flask-ripozo/badge.png?style=flat
         :target: https://crate.io/packages/flask-ripozo/
         :alt: Number of PyPI downloads
 
 ..
-
     .. image:: https://pypip.in/py_versions/flask-ripozo/badge.svg?style=flat
         :target: https://pypi.python.org/pypi/flask-ripozo/
         :alt: python versions
