@@ -3,13 +3,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import json
 from pypermedia.client import HypermediaClient
 import requests
 
 
 if __name__ == '__main__':
-    siren_client = HypermediaClient.connect('http://127.0.0.1:5000/api/taskboard/', request_factory=requests.Request)
+    siren_client = HypermediaClient.connect('http://127.0.0.1:8000/api/taskboard/', request_factory=requests.Request)
     task_board_list = siren_client.retrieve_list()
     created = task_board_list.create(title='My First Board')
 
