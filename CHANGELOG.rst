@@ -2,6 +2,7 @@
 ==================
 
 - Injected argument getter.  No longer attempts to automatically load json from the data.
+- Calling super on BaseDispatcher.  Correctly generates AutoOptions resource.
 
 
 0.1.4 (2015-05-08)
