@@ -34,14 +34,15 @@ session_handler = SessionHandler(db.session)
 
 
 class TaskBoardManager(AlchemyManager):
-    _fields = ('id', 'title', 'tasks.id',)
-    _list_fields = ('id', 'title',)
-    _update_fields = ('title',)
+    fields = ('id', 'title', 'tasks.id',)
+    list_fields = ('id', 'title',)
+    update_fields = ('title',)
     model = TaskBoard
     paginate_by = 10
 
+
 class TaskManager(AlchemyManager):
-    _fields = ('id', 'task_board_id', 'title', 'description', 'completed',)
+    fields = ('id', 'task_board_id', 'title', 'description', 'completed',)
     model = Task
     paginate_by = 20
 

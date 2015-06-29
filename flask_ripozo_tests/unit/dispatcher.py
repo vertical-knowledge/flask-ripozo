@@ -118,7 +118,7 @@ class TestFlaskDispatcher(unittest2.TestCase):
         with app.test_request_context():
             self.assertEqual(d.base_url, 'http://localhost/')
 
-        d = FlaskDispatcher(app, url_prefix='someprefix')
+        d = FlaskDispatcher(app, url_prefix='someprefix', auto_options_name='Options2')
         with app.test_request_context():
             self.assertEqual(d.base_url, 'http://localhost/someprefix')
 

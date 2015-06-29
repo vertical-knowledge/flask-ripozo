@@ -71,7 +71,7 @@ class FlaskDispatcher(DispatcherBase):
     """
 
     def __init__(self, app, url_prefix='', error_handler=exception_handler,
-                 argument_getter=get_request_query_body_args):
+                 argument_getter=get_request_query_body_args, **kwargs):
         """
         Initialize the adapter.  The app can actually be either a flask.Flask
         instance or a flask.Blueprint instance.
@@ -93,9 +93,12 @@ class FlaskDispatcher(DispatcherBase):
         self.app = app
         self.url_map = Map()
         self.function_for_endpoint = {}
+        if url_prefix and not url_prefix.startswith('/'):
+            url_prefix = '/{0}'.format(url_prefix)
         self.url_prefix = url_prefix
         self.error_handler = error_handler
         self.argument_getter = argument_getter
+        super(FlaskDispatcher, self).__init__(**kwargs)
 
     @property
     def base_url(self):

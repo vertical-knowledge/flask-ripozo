@@ -122,9 +122,9 @@ Defining managers is actually very simple:
     session_handler = SessionHandler(db.session)
 
     class TaskBoardManager(AlchemyManager):
-        _fields = ('id', 'title', 'tasks.id',)
-        _list_fields = ('id', 'title',)
-        _update_fields = ('title',)
+        fields = ('id', 'title', 'tasks.id',)
+        list_fields = ('id', 'title',)
+        update_fields = ('title',)
         model = TaskBoard
         paginate_by = 10
 
