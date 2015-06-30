@@ -72,7 +72,8 @@ class TaskResource(restmixins.CRUD):
 
 dispatcher = FlaskDispatcher(app, url_prefix='/api')
 dispatcher.register_resources(TaskBoardResource, TaskResource)
-dispatcher.register_adapters(adapters.SirenAdapter, adapters.HalAdapter)
+dispatcher.register_adapters(adapters.SirenAdapter, adapters.HalAdapter,
+                             adapters.BasicJSONAdapter)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
