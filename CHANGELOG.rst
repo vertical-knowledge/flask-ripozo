@@ -1,5 +1,5 @@
-0.1.5 (unreleased)
-==================
+1.0.0b1 (2015-06-29)
+====================
 
 - Injected argument getter.  No longer attempts to automatically load json from the data.
 - Calling super on BaseDispatcher.  Correctly generates AutoOptions resource.
