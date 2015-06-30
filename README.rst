@@ -33,7 +33,7 @@ integrate ripozo with Flask.  As with all dispatchers it is simply
 for getting the request arguments and appropriately routing them to
 the various resources for handling.
 
-Check out the `tutorial.<http://flask-ripozo.readthedocs.org/en/latest/flask_tutorial.html>`_
+Check out the `tutorial. <http://flask-ripozo.readthedocs.org/en/latest/flask_tutorial.html>`_
 
 Example
 =======
