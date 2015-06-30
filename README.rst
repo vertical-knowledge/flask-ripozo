@@ -35,6 +35,8 @@ the various resources for handling.
 
 Check out the `tutorial. <http://flask-ripozo.readthedocs.org/en/latest/flask_tutorial.html>`_
 
+Or maybe the `ripozo documentation. <http://ripozo.readthedocs.org/`_
+
 Example
 =======
 
