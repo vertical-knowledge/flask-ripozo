@@ -190,7 +190,7 @@ def flask_dispatch_wrapper(dispatcher, f, argument_getter=get_request_query_body
         request_args, body_args = argument_getter(request)
         r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=body_args,
                              headers=request.headers)
-        accepted_mimetypes = request.accept_mimetypes
+        accepted_mimetypes = [accept[0] for accept in request.accept_mimetypes]
         try:
             adapter = dispatcher.dispatch(f, accepted_mimetypes, r)
         except Exception as e:
