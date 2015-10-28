@@ -73,6 +73,7 @@ manager.
 .. code-block:: python
 
     from ripozo import restmixins, ListRelationship, Relationship
+    from ripozo.decorators import apimethod
 
     class TaskBoardResource(restmixins.CRUDL):
         manager = TaskBoardManager(session_handler)
@@ -114,7 +115,7 @@ Defining managers is actually very simple:
 
 .. code-block:: python
 
-    from ripozo_sqlalchemy import AlchemyManager
+    from ripozo_sqlalchemy import AlchemyManager, SessionHandler
 
     # This is the most basic session handler.
     # It simply passes the db.session object and
