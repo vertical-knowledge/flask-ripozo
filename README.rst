@@ -49,8 +49,8 @@ This example describes a minimal flask-ripozo application.
     from flask_ripozo import FlaskDispatcher
 
     from ripozo.decorators import apimethod
-    from ripozo.dispatcher.adapters import SirenAdapter, HalAdapter
-    from ripozo.viewsets.resource_base import ResourceBase
+    from ripozo.adapters import SirenAdapter, HalAdapter
+    from ripozo.resources import ResourceBase
 
 
     class HelloWorldViewset(ResourceBase):
@@ -64,7 +64,7 @@ This example describes a minimal flask-ripozo application.
         @apimethod(methods=['GET'])
         def hello(cls, request, *args, **kwargs):
             faked_response_properties = {'content': 'hello world'}
-            return cls(properties=filters)
+            return cls(properties=faked_response_properties)
 
     # Create the flask application
     app = Flask(__name__)
