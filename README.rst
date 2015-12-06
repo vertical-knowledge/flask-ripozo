@@ -54,7 +54,7 @@ This example describes a minimal flask-ripozo application.
 
 
     class HelloWorldViewset(ResourceBase):
-        _resource_name = 'myresource'     # The name of the resource.  This will be appended to
+        resource_name = 'myresource'     # The name of the resource.  This will be appended to
                                           # the _namespace to complete the url.
 
         # The decorator indicates that the base url will be used
@@ -70,7 +70,7 @@ This example describes a minimal flask-ripozo application.
     app = Flask(__name__)
 
     # Create the dispatcher
-    dispatcher = FlaskDispatcher(app, base_url='/api')
+    dispatcher = FlaskDispatcher(app, url_prefix='/api')
     
     # Specify the valid response types
     dispatcher.register_adapters(SirenAdapter, HalAdapter)
@@ -78,7 +78,7 @@ This example describes a minimal flask-ripozo application.
     # This will register all of the apimethod decorated methods in
     # this class specified.  In this case it adds the /api/myresource GET
     # route to the application
-    dispatcher.register_class_routes(HelloWorldViewset)
+    dispatcher.register_resources(HelloWorldViewset)
 
     if __name__ == '__main__':
         app.run() # Run the app
