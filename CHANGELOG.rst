@@ -1,4 +1,4 @@
-1.0.2 (unreleased)
+1.0.2 (2016-02-16)
 ==================
 
 - Bug fix for headers that allows the RequestContainer headers to be copied
