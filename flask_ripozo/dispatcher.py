@@ -55,13 +55,17 @@ def get_request_query_body_args(request_obj):
     a builtin dict.
 
     :param flask.Request request_obj: A Flask request object.
-    :return: A tuple of the appropriately formatted query args and body args
-    :rtype: (dict, dict)
+    :return: A tuple of the appropriately formatted query
+        args, body args, and headers
+    :rtype: (dict, dict, dict)
     """
     query_args = dict(request_obj.args)
     body = request_obj.get_json() or request_obj.form or {}
     body = dict(body)
-    return query_args, body
+
+    # Make a copy of the headers
+    headers = {key: value for key, value in six.iteritems(request_obj.headers)}
+    return query_args, body, headers
 
 
 class FlaskDispatcher(DispatcherBase):
@@ -76,7 +80,7 @@ class FlaskDispatcher(DispatcherBase):
         Initialize the adapter.  The app can actually be either a flask.Flask
         instance or a flask.Blueprint instance.
 
-        :param flask.Flask app: The flask app that is responsible for
+        :param flask.Flask|flask.Blueprint app: The flask app that is responsible for
             handling the web application.
         :param unicode url_prefix: The url prefix will be prepended to
             every route that is registered on this dispatcher.  It is
@@ -147,7 +151,6 @@ class FlaskDispatcher(DispatcherBase):
                               methods=methods, **options)
 
 
-
 def flask_dispatch_wrapper(dispatcher, f, argument_getter=get_request_query_body_args):
     """
     A decorator for wrapping the apimethods provided to the
@@ -187,12 +190,14 @@ def flask_dispatch_wrapper(dispatcher, f, argument_getter=get_request_query_body
         :return: A response that the flask application can return.
         :rtype: flask.Response
         """
-        request_args, body_args = argument_getter(request)
-        r = RequestContainer(url_params=urlparams, query_args=request_args, body_args=body_args,
-                             headers=request.headers)
+        request_args, body_args, headers = argument_getter(request)
+        ripozo_request = RequestContainer(url_params=urlparams,
+                                          query_args=request_args,
+                                          body_args=body_args,
+                                          headers=headers)
         accepted_mimetypes = [accept[0] for accept in request.accept_mimetypes]
         try:
-            adapter = dispatcher.dispatch(f, accepted_mimetypes, r)
+            adapter = dispatcher.dispatch(f, accepted_mimetypes, ripozo_request)
         except Exception as e:
             _logger.exception(e)
             return dispatcher.error_handler(dispatcher, accepted_mimetypes, e)

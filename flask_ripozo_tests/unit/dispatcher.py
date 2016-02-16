@@ -149,18 +149,21 @@ class TestFlaskDispatcher(unittest2.TestCase):
         """
         query_args = dict(x=1)
         form = dict(x=2)
-        mck = mock.Mock(args=query_args, form=form, get_json=mock.Mock(return_value=None))
-        q, b = get_request_query_body_args(mck)
+        mck = mock.Mock(args=query_args, form=form,
+                        get_json=mock.Mock(return_value=None), headers={})
+        q, b, h = get_request_query_body_args(mck)
         self.assertDictEqual(query_args, q)
         self.assertDictEqual(form, b)
 
-        mck = mock.MagicMock(args=query_args, form=None, get_json=mock.Mock(return_value=form))
-        q, b = get_request_query_body_args(mck)
+        mck = mock.MagicMock(args=query_args, form=None,
+                             get_json=mock.Mock(return_value=form), headers={})
+        q, b, h = get_request_query_body_args(mck)
         self.assertDictEqual(query_args, q)
         self.assertDictEqual(form, b)
 
-        mck = mock.MagicMock(args=query_args, form=None, get_json=mock.Mock(return_value=None), data=json.dumps(form))
-        q, b = get_request_query_body_args(mck)
+        mck = mock.MagicMock(args=query_args, form=None,
+                             get_json=mock.Mock(return_value=None), data=json.dumps(form), headers={})
+        q, b, h = get_request_query_body_args(mck)
         self.assertDictEqual(query_args, q)
         self.assertDictEqual({}, b)
 

@@ -20,11 +20,11 @@ class TestDispatcherFlaskIntegration(unittest2.TestCase):
         app = Flask('myapp')
         body = dict(x=1)
         with app.test_request_context('/', data=json.dumps(body), content_type='application/json'):
-            q, b = get_request_query_body_args(request)
+            q, b, headers = get_request_query_body_args(request)
             self.assertDictEqual(b, body)
 
         with app.test_request_context('/', data=body):  # Form encoded
-            q, b = get_request_query_body_args(request)
+            q, b, headers = get_request_query_body_args(request)
             self.assertDictEqual(b, dict(x=['1']))
 
     def test_get_request_body_args_nested(self):
@@ -35,5 +35,16 @@ class TestDispatcherFlaskIntegration(unittest2.TestCase):
         app = Flask('myapp')
         body = dict(x=1, y=dict(x=1))
         with app.test_request_context('/', data=json.dumps(body), content_type='application/json'):
-            q, b = get_request_query_body_args(request)
+            q, b, headers = get_request_query_body_args(request)
             self.assertDictEqual(b, body)
+
+    def test_headers_copyable(self):
+        """
+        Tests that the headers returned from get_request_query_body_args
+        appropriately returns the headers as a dictionary that can be copied
+        """
+        app = Flask('myapp')
+        with app.test_request_context('/'):
+            q, b, headers = get_request_query_body_args(request)
+        headers2 = headers.copy()
+        self.assertDictEqual(headers, headers2)
