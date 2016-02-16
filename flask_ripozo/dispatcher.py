@@ -64,7 +64,9 @@ def get_request_query_body_args(request_obj):
     body = dict(body)
 
     # Make a copy of the headers
-    headers = {key: value for key, value in six.iteritems(request_obj.headers)}
+    headers = {}
+    for key, value in six.iteritems(request_obj.headers):
+        headers[key] = value
     return query_args, body, headers
 
 
