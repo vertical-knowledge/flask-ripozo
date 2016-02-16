@@ -49,12 +49,12 @@ This example describes a minimal flask-ripozo application.
     from flask_ripozo import FlaskDispatcher
 
     from ripozo.decorators import apimethod
-    from ripozo.dispatcher.adapters import SirenAdapter, HalAdapter
-    from ripozo.viewsets.resource_base import ResourceBase
+    from ripozo.adapters import SirenAdapter, HalAdapter
+    from ripozo.resources import ResourceBase
 
 
     class HelloWorldViewset(ResourceBase):
-        _resource_name = 'myresource'     # The name of the resource.  This will be appended to
+        resource_name = 'myresource'     # The name of the resource.  This will be appended to
                                           # the _namespace to complete the url.
 
         # The decorator indicates that the base url will be used
@@ -64,13 +64,13 @@ This example describes a minimal flask-ripozo application.
         @apimethod(methods=['GET'])
         def hello(cls, request, *args, **kwargs):
             faked_response_properties = {'content': 'hello world'}
-            return cls(properties=filters)
+            return cls(properties=faked_response_properties)
 
     # Create the flask application
     app = Flask(__name__)
 
     # Create the dispatcher
-    dispatcher = FlaskDispatcher(app, base_url='/api')
+    dispatcher = FlaskDispatcher(app, url_prefix='/api')
     
     # Specify the valid response types
     dispatcher.register_adapters(SirenAdapter, HalAdapter)
@@ -78,7 +78,7 @@ This example describes a minimal flask-ripozo application.
     # This will register all of the apimethod decorated methods in
     # this class specified.  In this case it adds the /api/myresource GET
     # route to the application
-    dispatcher.register_class_routes(HelloWorldViewset)
+    dispatcher.register_resources(HelloWorldViewset)
 
     if __name__ == '__main__':
         app.run() # Run the app
