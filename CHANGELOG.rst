@@ -1,7 +1,7 @@
 1.0.3 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Backwards compatibility fix for the headers that keeps them case insensitive
 
 
 1.0.2 (2016-02-16)
