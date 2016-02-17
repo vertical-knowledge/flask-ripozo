@@ -20,6 +20,14 @@ import six
 _logger = logging.getLogger(__name__)
 
 
+class _CaseInsentiveDict(dict):
+    def __setitem__(self, key, value):
+        super(_CaseInsentiveDict, self).__setitem__(key.lower(), value)
+
+    def __getitem__(self, key):
+        return super(_CaseInsentiveDict, self).__getitem__(key.lower())
+
+
 def exception_handler(dispatcher, accepted_mimetypes, exc):
     """
     Responsible for handling exceptions in the project.
@@ -64,7 +72,7 @@ def get_request_query_body_args(request_obj):
     body = dict(body)
 
     # Make a copy of the headers
-    headers = {}
+    headers = _CaseInsentiveDict()
     for key, value in six.iteritems(request_obj.headers):
         headers[key] = value
     return query_args, body, headers
