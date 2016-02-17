@@ -44,7 +44,8 @@ setup(
         'unittest2',
         'mock',
         'six',
-        'tox'
+        'tox',
+        'webtest'
     ],
     url='http://flask-ripozo.readthedocs.org/',
     version=version
