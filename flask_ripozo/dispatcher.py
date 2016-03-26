@@ -68,8 +68,11 @@ def get_request_query_body_args(request_obj):
     :rtype: (dict, dict, dict)
     """
     query_args = dict(request_obj.args)
-    body = request_obj.get_json() or request_obj.form or {}
-    body = dict(body)
+    body = dict(
+        request_obj.get_json(force=True, silent=True) or
+        request_obj.form or
+        {}
+    )
 
     # Make a copy of the headers
     headers = _CaseInsentiveDict()
