@@ -1,7 +1,7 @@
 1.0.4 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Always attempt to load body as JSON until the release of ripozo v2.0.0
 
 
 1.0.3 (2016-02-17)
