@@ -24,7 +24,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    description='An extension for ripozo and that brings HATEOAS/REST/Hypermedia apis to flask',
+    description='An extension for ripozo that brings HATEOAS/REST/Hypermedia apis to flask',
     extras_require={
         'examples': [
             'flask-ripozo',
