@@ -38,7 +38,7 @@ setup(
         'Flask'
     ],
     name='flask-ripozo',
-    packages=find_packages(exclude=['tests', 'tests.*']),
+    packages=find_packages(exclude=['*_tests*', 'examples', 'profiling']),
     test_suite='flask_ripozo_tests',
     tests_require=[
         'unittest2',
