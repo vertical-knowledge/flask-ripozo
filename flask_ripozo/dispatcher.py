@@ -31,10 +31,12 @@ class _CaseInsentiveDict(dict):
 def exception_handler(dispatcher, accepted_mimetypes, exc):
     """
     Responsible for handling exceptions in the project.
-    This catches any RestException (from ripozo.exceptions)
-    and calls the format_exception class method on the adapter
-    class.  It will appropriately set the status_code, response,
-    and content type for the exception.
+    This catches **any** Exception and calls the format_exception
+    class method on the adapter class.  It will appropriately set
+    the status_code, response, and content type for the exception.
+
+    If you want an exception to set a status_code other than 500,
+    ensure that it has a ``status_code`` attribute.
 
     :param FlaskDispatcher dispatcher: A FlaskDispatcher instance
         used to format the exception
@@ -44,11 +46,10 @@ def exception_handler(dispatcher, accepted_mimetypes, exc):
     :return: A flask Response object.
     :rtype: flask.Response
     """
-    if isinstance(exc, RestException):
-        adapter_klass = dispatcher.get_adapter_for_type(accepted_mimetypes)
-        response, content_type, status_code = adapter_klass.format_exception(exc)
-        return Response(response=response, content_type=content_type, status=status_code)
-    raise exc
+    adapter_klass = dispatcher.get_adapter_for_type(accepted_mimetypes)
+    response, content_type, status_code = adapter_klass.format_exception(exc)
+    return Response(response=response, content_type=content_type,
+                    status=status_code)
 
 
 def get_request_query_body_args(request_obj):

@@ -67,32 +67,10 @@ class TestFlaskDispatcher(unittest2.TestCase):
             self.assertEqual(response.status_code, 600)
             self.assertEqual(response.data.decode('utf8'), 'some body')
 
-    def test_flask_dispatch_wrapper_fail_restexception(self):
-        """
-        Tests the response when their is a failure in
-        dispatching a request. In particular when a RestException
-        is raised.
-        """
-        adapter_class = self.get_mock_adapter_class()
-
-        def fake(*args, **kwargs):
-            raise RestException
-
-        d = FlaskDispatcher(self.app)
-        d.register_adapters(adapter_class)
-        view_func = flask_dispatch_wrapper(d, fake)
-        self.assertEqual(view_func.__name__, fake.__name__)
-
-        with self.app.test_request_context('/myresource'):
-            response = view_func()
-            self.assertEqual(response.status_code, 500)
-            self.assertEqual(response.data.decode('utf8'), 'error')
-            self.assertEqual(response.content_type, 'fake')
-
     def test_flask_dispatch_wrapper_fail(self):
         """
-        Tests the response when their is a failure in
-        dispatching a request that is not a RestException
+        Tests the response when there is a failure in
+        dispatching a request
         """
         adapter_class = self.get_mock_adapter_class()
 
@@ -105,7 +83,10 @@ class TestFlaskDispatcher(unittest2.TestCase):
         self.assertEqual(view_func.__name__, fake.__name__)
 
         with self.app.test_request_context('/myresource'):
-            self.assertRaises(Exception, view_func)
+            response = view_func()
+            self.assertEqual(response.status_code, 500)
+            self.assertEqual(response.data.decode('utf8'), 'error')
+            self.assertEqual(response.content_type, 'fake')
 
     def test_base_url(self):
         """
